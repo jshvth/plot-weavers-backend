@@ -33,7 +33,7 @@ def upload_profile():
 
 
 # Story-Bild hochladen
-@upload_bp.route("/story/<int:story_id>", methods=["POST"])
+@upload_bp.route("/story/<string:story_id>", methods=["POST"])
 def upload_story(story_id):
     if "file" not in request.files:
         return jsonify({"error": "No file part"}), 400

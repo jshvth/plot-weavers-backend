@@ -3,6 +3,7 @@ import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db
 
+
 def generate_uuid():
     return str(uuid.uuid4())
 

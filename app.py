@@ -34,6 +34,10 @@ def create_app():
     app.register_blueprint(favorite_bp, url_prefix="/favorites")
     app.register_blueprint(comment_bp, url_prefix="/comments")
 
+    @app.route("/")
+    def index():
+        return {"message": "✅ PlotWeavers Backend is running!"}
+
     # Datenbanktabellen erstellen
     with app.app_context():
         db.create_all()

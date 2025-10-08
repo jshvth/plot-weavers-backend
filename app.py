@@ -6,6 +6,9 @@ from routes.user_routes import user_bp
 from routes.story_routes import story_bp
 from routes.chapter_routes import chapter_bp
 from routes.upload_routes import upload_bp
+from routes.like_routes import like_bp
+from routes.favorites_routes import favorite_bp
+from routes.comment_routes import comment_bp
 import os
 
 def create_app():
@@ -27,6 +30,9 @@ def create_app():
     app.register_blueprint(story_bp, url_prefix="/stories")
     app.register_blueprint(chapter_bp, url_prefix="/chapters")
     app.register_blueprint(upload_bp, url_prefix="/upload")
+    app.register_blueprint(like_bp, url_prefix="/likes")
+    app.register_blueprint(favorite_bp, url_prefix="/favorites")
+    app.register_blueprint(comment_bp, url_prefix="/comments")
 
     # Datenbanktabellen erstellen
     with app.app_context():

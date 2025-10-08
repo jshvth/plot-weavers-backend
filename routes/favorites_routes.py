@@ -1,31 +1,45 @@
 # routes/favorite_routes.py
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import Favorite, db, Story
+from flask import Blueprint, request, jsonify
+from extensions import db
+from models import Favorite, Story, User
 
 favorite_bp = Blueprint("favorite_bp", __name__)
 
-@favorite_bp.route("/<string:story_id>", methods=["POST"])
-@jwt_required()
-def toggle_favorite(story_id):
-    current_user_id = get_jwt_identity()
-    favorite = Favorite.query.filter_by(user_id=current_user_id, story_id=story_id).first()
+# 🔹 GET: Favoriten eines Nutzers abrufen
+@favorite_bp.route("/users/<user_id>/favorites", methods=["GET"])
+def get_user_favorites(user_id):
+    favorites = Favorite.query.filter_by(user_id=user_id).all()
+    return jsonify([
+        {
+            "id": f.id,
+            "story_id": f.story_id,
+            "user_id": f.user_id
+        } for f in favorites
+    ]), 200
 
-    if favorite:
-        db.session.delete(favorite)
+
+# 🔹 POST: Story favorisieren oder entfernen (toggle)
+@favorite_bp.route("/stories/<story_id>/favorite", methods=["POST"])
+def toggle_favorite(story_id):
+    data = request.get_json()
+    user_id = data.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "user_id is required"}), 400
+
+    user = User.query.get(user_id)
+    story = Story.query.get(story_id)
+    if not user or not story:
+        return jsonify({"error": "Invalid user_id or story_id"}), 404
+
+    existing_fav = Favorite.query.filter_by(user_id=user_id, story_id=story_id).first()
+
+    if existing_fav:
+        db.session.delete(existing_fav)
         db.session.commit()
-        return jsonify({"message": "Removed from favorites"}), 200
+        return jsonify({"message": "Story removed from favorites"}), 200
     else:
-        new_fav = Favorite(user_id=current_user_id, story_id=story_id)
+        new_fav = Favorite(user_id=user_id, story_id=story_id)
         db.session.add(new_fav)
         db.session.commit()
-        return jsonify({"message": "Added to favorites"}), 201
-
-
-@favorite_bp.route("/user", methods=["GET"])
-@jwt_required()
-def get_user_favorites():
-    current_user_id = get_jwt_identity()
-    favorites = Favorite.query.filter_by(user_id=current_user_id).all()
-    result = [{"story_id": f.story_id} for f in favorites]
-    return jsonify(result), 200
+        return jsonify({"message": "Story added to favorites"}), 201

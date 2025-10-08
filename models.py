@@ -1,7 +1,8 @@
+from extensions import db
 from datetime import datetime
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
-from extensions import db
+
 
 
 def generate_uuid():
@@ -61,3 +62,17 @@ class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.String, db.ForeignKey("user.id"), nullable=False)
     chapter_id = db.Column(db.String, db.ForeignKey("chapter.id"), nullable=False)
+
+# Comment
+class Comment(db.Model):
+    __tablename__ = "comment"
+
+    id = db.Column(db.Integer, primary_key=True)
+    story_id = db.Column(db.String, db.ForeignKey("story.id"), nullable=False)
+    user_id = db.Column(db.String, db.ForeignKey("user.id"), nullable=False)
+    username = db.Column(db.String(100))
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    story = db.relationship("Story", backref=db.backref("comments", lazy=True))
+    user = db.relationship("User", backref=db.backref("comments", lazy=True))

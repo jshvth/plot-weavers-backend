@@ -1,1 +1,32 @@
 .env
+# Python
+# Virtual Environment
+venv/
+env/
+.venv/
+.env/
+
+# Byte-Code
+*.pyc
+__pycache__/
+*~
+*.bak
+
+# Packaging
+.Python
+build/
+dist/
+*.egg-info/
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# OS Generated Files
+.DS_Store
+.Trashes
+Thumbs.db
+
+# Flask/Werkzeug specific
+instance/

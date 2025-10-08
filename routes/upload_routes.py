@@ -13,7 +13,7 @@ def allowed_file(filename):
 
 
 # Profilbild hochladen
-@upload_bp.route("/upload/profile", methods=["POST"])
+@upload_bp.route("/profile", methods=["POST"])
 def upload_profile():
     if "file" not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -33,7 +33,7 @@ def upload_profile():
 
 
 # Story-Bild hochladen
-@upload_bp.route("/upload/story/<int:story_id>", methods=["POST"])
+@upload_bp.route("/story/<int:story_id>", methods=["POST"])
 def upload_story(story_id):
     if "file" not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -53,11 +53,11 @@ def upload_story(story_id):
 
 
 # Route um Bilder auszuliefern (Frontend kann sie direkt laden)
-@upload_bp.route("/uploads/profiles/<filename>")
+@upload_bp.route("/profiles/<filename>")
 def get_profile_image(filename):
     return send_from_directory(current_app.config["UPLOAD_FOLDER_PROFILES"], filename)
 
 
-@upload_bp.route("/uploads/stories/<filename>")
+@upload_bp.route("/stories/<filename>")
 def get_story_image(filename):
     return send_from_directory(current_app.config["UPLOAD_FOLDER_STORIES"], filename)

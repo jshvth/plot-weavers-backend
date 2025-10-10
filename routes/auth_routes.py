@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from extensions import db
 from models import User
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask import current_app
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -40,3 +41,19 @@ def me():
         "username": user.username,
         "profile_image": user.profile_image
     })
+
+@auth_bp.before_app_request
+def create_default_admin():
+    # Nur einmal pro App-Start
+    if getattr(current_app, "_admin_created", False):
+        return
+
+    admin = User.query.filter_by(username="admin").first()
+    if not admin:
+        admin = User(username="admin")
+        admin.set_password("admin")  # 👉 korrekter Weg, Passwort wird gehasht
+        db.session.add(admin)
+        db.session.commit()
+        print("✅ Default admin created: username='admin', password='admin'")
+
+    current_app._admin_created = True

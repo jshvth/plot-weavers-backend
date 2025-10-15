@@ -22,6 +22,8 @@ def all_stories():
 @jwt_required()
 def create_story():
     data = request.json
+
+    # ✅ Neue Story anlegen
     story = Story(
         title=data["title"],
         description=data.get("description"),
@@ -29,9 +31,23 @@ def create_story():
         image=data.get("image"),
         user_id=get_jwt_identity()
     )
+
     db.session.add(story)
     db.session.commit()
-    return jsonify({"message": "Story created", "id": story.id}), 201
+
+    # ✅ Vollständiges Story-Objekt zurückgeben
+    return jsonify({
+        "message": "Story created successfully",
+        "story": {
+            "id": story.id,
+            "title": story.title,
+            "description": story.description,
+            "genre": story.genre,
+            "image": story.image,
+            "created_by": story.creator.username
+        }
+    }), 201
+
 
 
 @story_bp.route("/<id>", methods=["GET"])

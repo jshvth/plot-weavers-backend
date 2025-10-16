@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-from extensions import db, jwt, cors
+from extensions import db, jwt
 from routes.auth_routes import auth_bp
 from routes.user_routes import user_bp
 from routes.story_routes import story_bp
@@ -9,32 +9,29 @@ from routes.upload_routes import upload_bp
 from routes.like_routes import like_bp
 from routes.favorites_routes import favorite_bp
 from routes.comment_routes import comment_bp
+from flask_cors import CORS
 import os
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # ✅ CORS aktivieren (mit mehreren Origins)
-    cors.init_app(app, resources={
-        r"/*": {
-            "origins": [
-                "https://plot-weavers-frontend.onrender.com",
-                "http://localhost:5173"
-            ],
-            "supports_credentials": True
-        }
-    })
+    # ✅ CORS vollständig freischalten (inkl. Credentials + Preflight)
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:5173", "https://plot-weavers-frontend.onrender.com"]}},
+         supports_credentials=True,
+         allow_headers=["Content-Type", "Authorization"],
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 
-    # ✅ Extensions initialisieren
+    # Init Extensions
     db.init_app(app)
     jwt.init_app(app)
 
-    # 📁 Upload-Ordner sicherstellen
+    # Upload-Ordner sicherstellen
     os.makedirs(app.config["UPLOAD_FOLDER_PROFILES"], exist_ok=True)
     os.makedirs(app.config["UPLOAD_FOLDER_STORIES"], exist_ok=True)
 
-    # ✅ Blueprints registrieren
+    # Blueprints
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(user_bp, url_prefix="/users")
     app.register_blueprint(story_bp, url_prefix="/stories")
@@ -48,7 +45,6 @@ def create_app():
     def index():
         return {"message": "✅ PlotWeavers Backend is running!"}
 
-    # 📦 DB-Tabellen erzeugen
     with app.app_context():
         db.create_all()
 

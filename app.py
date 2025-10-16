@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-from extensions import db, jwt, cors
+from extensions import db, jwt  # ❌ cors hier raus
 from routes.auth_routes import auth_bp
 from routes.user_routes import user_bp
 from routes.story_routes import story_bp
@@ -9,16 +9,27 @@ from routes.upload_routes import upload_bp
 from routes.like_routes import like_bp
 from routes.favorites_routes import favorite_bp
 from routes.comment_routes import comment_bp
+from flask_cors import CORS
 import os
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # ✅ CORS nur hier eindeutig aktivieren:
+    CORS(app, resources={
+        r"/*": {
+            "origins": [
+                "https://plot-weavers-frontend.onrender.com",
+                "http://localhost:5173"
+            ],
+            "supports_credentials": True
+        }
+    })
+
     # Init Extensions
     db.init_app(app)
     jwt.init_app(app)
-    cors.init_app(app)
 
     # Sicherstellen, dass Upload-Ordner existieren
     os.makedirs(app.config["UPLOAD_FOLDER_PROFILES"], exist_ok=True)

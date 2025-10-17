@@ -33,6 +33,7 @@ def get_chapters_by_story():
 @jwt_required()
 def create_chapter():
     data = request.json
+    return "test"
     chapter = Chapter(
         title=data["title"],
         content=data.get("content"),

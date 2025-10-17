@@ -17,7 +17,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # ✅ CORS vollständig aktivieren (Frontend + Render)
+    #  CORS vollständig aktivieren
     CORS(
         app,
         resources={r"/*": {"origins": [

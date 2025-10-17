@@ -22,6 +22,7 @@ def create_app():
         app,
         resources={r"/*": {"origins": [
             "http://localhost:5173",
+            "http://localhost:5174",
             "https://plot-weavers-frontend.onrender.com"
         ]}},
         supports_credentials=True,

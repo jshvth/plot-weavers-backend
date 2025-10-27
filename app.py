@@ -17,13 +17,12 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    local_ports = [f"http://localhost:{port}" for port in range(5173, 5180)]
+
     #  CORS vollständig aktivieren
     CORS(
         app,
-        resources={r"/*": {"origins": [
-            "http://localhost:5173",
-            "http://localhost:5174",
-            "http://localhost:5175",
+        resources={r"/*": {"origins": local_ports + [
             "https://plot-weavers-frontend.onrender.com"
         ]}},
         supports_credentials=True,
@@ -37,7 +36,7 @@ def create_app():
         if request.method == "OPTIONS":
             response = make_response()
             origin = request.headers.get("Origin", "")
-            if origin in ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "https://plot-weavers-frontend.onrender.com"]:
+            if origin in ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177", "https://plot-weavers-frontend.onrender.com"]:
                 response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"

@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -7,6 +8,9 @@ class Config:
     # 🔐 Security
     SECRET_KEY = os.getenv("SECRET_KEY", "supersecret")
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "jwt-secret")
+
+    # ⏳ Token-Gültigkeit (Standard war 15 Min → jetzt 7 Tage)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=7)
 
     # 🗄️ Datenbank
     DATABASE_URL = os.getenv("DATABASE_URL")

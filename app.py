@@ -37,7 +37,7 @@ def create_app():
         if request.method == "OPTIONS":
             response = make_response()
             origin = request.headers.get("Origin", "")
-            if origin in ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "https://plot-weavers-frontend.onrender.com"]:
+            if origin in ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176" "https://plot-weavers-frontend.onrender.com"]:
                 response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"

@@ -22,6 +22,7 @@ def get_chapters_by_story():
             "title": c.title,
             "content": c.content,
             "story_id": c.story_id,
+            "parent_id": c.parent_id,
             "created_by": c.creator.username if c.creator else None
         }
         for c in chapters
@@ -41,20 +42,21 @@ def create_chapter():
     chapter = Chapter(
         title=data["title"],
         content=data.get("content"),
-        story_id=data["story_id"],  # bleibt String (UUID)
+        story_id=data["story_id"],
+        parent_id=data.get("parent_id"),  # 🧩 wichtig für Verzweigungen!
         user_id=get_jwt_identity()
     )
 
     db.session.add(chapter)
     db.session.commit()
 
-    # 🪄 Bonus: vollständiges Response-Objekt zurückgeben
     return jsonify({
         "message": "Chapter created",
         "id": chapter.id,
         "title": chapter.title,
         "content": chapter.content,
         "story_id": chapter.story_id,
+        "parent_id": chapter.parent_id,
         "created_by": chapter.creator.username if chapter.creator else None
     }), 201
 
@@ -68,6 +70,7 @@ def get_chapter(id):
         "title": c.title,
         "content": c.content,
         "story_id": c.story_id,
+        "parent_id": c.parent_id,
         "created_by": c.creator.username if c.creator else None
     })
 

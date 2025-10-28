@@ -49,6 +49,17 @@ class Chapter(db.Model):
     story_id = db.Column(db.String, db.ForeignKey("story.id"), nullable=False)
     user_id = db.Column(db.String, db.ForeignKey("user.id"), nullable=False)
 
+    # 🧩 Neues Feld für Parent-Child-Verknüpfung
+    parent_id = db.Column(db.String, db.ForeignKey("chapter.id"), nullable=True)
+    children = db.relationship(
+        "Chapter",
+        backref=db.backref("parent", remote_side=[id]),
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self):
+        return f"<Chapter {self.title}>"
+
 
 # Favorites
 class Favorite(db.Model):

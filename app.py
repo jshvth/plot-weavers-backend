@@ -9,6 +9,7 @@ from routes.upload_routes import upload_bp
 from routes.like_routes import like_bp
 from routes.favorites_routes import favorite_bp
 from routes.comment_routes import comment_bp
+from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import os
 

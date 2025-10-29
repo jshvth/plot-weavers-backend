@@ -31,9 +31,9 @@ class Story(db.Model):
     title = db.Column(db.String(120), nullable=False)
     description = db.Column(db.Text, nullable=True)
     genre = db.Column(db.String(50), nullable=True)
-    image = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    cover_image = db.Column(db.String(255), nullable=True)
 
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.String, db.ForeignKey("user.id"), nullable=False)
 
     chapters = db.relationship("Chapter", backref="story", cascade="all, delete", lazy=True)

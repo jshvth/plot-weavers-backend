@@ -7,18 +7,25 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 story_bp = Blueprint("stories", __name__)
 
-# 🟢 Alle Stories abrufen
+# ✅ Alle Stories abrufen (sicher & robust)
 @story_bp.route("/all", methods=["GET"])
 def all_stories():
-    stories = Story.query.all()
-    return jsonify([{
-        "id": s.id,
-        "title": s.title,
-        "description": s.description,
-        "genre": s.genre,
-        "cover_image": s.cover_image,
-        "created_by": s.creator.username
-    } for s in stories])
+    try:
+        stories = Story.query.all()
+        return jsonify([
+            {
+                "id": s.id,
+                "title": s.title,
+                "description": s.description,
+                "genre": s.genre,
+                "cover_image": s.cover_image,
+                "created_by": s.creator.username if s.creator else "Unknown",
+            }
+            for s in stories
+        ]), 200
+    except Exception as e:
+        print("❌ Fehler beim Laden der Stories:", e)
+        return jsonify({"error": str(e)}), 500
 
 
 # 🟢 Story erstellen (mit optionalem Cover-Bild)

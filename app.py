@@ -63,6 +63,12 @@ def create_app():
     app.register_blueprint(favorite_bp, url_prefix="/favorites")
     app.register_blueprint(comment_bp, url_prefix="/comments")
 
+    # 🖼️ STATIC ROUTE: für Story-Bilder
+    @app.route("/uploads/stories/<path:filename>")
+    def serve_story_image(filename):
+        folder = os.path.join(app.root_path, "uploads", "stories")
+        return send_from_directory(folder, filename)
+
     @app.route("/")
     def index():
         return {"message": "✅ PlotWeavers Backend is running!"}

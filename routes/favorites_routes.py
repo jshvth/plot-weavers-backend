@@ -1,45 +1,49 @@
-# routes/favorite_routes.py
-from flask import Blueprint, request, jsonify
+# routes/favorites_routes.py
+from flask import Blueprint, jsonify, request
 from extensions import db
 from models import Favorite, Story, User
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
-favorite_bp = Blueprint("favorite_bp", __name__)
+favorite_bp = Blueprint("favorites", __name__)
 
-# 🔹 GET: Favoriten eines Nutzers abrufen
-@favorite_bp.route("/users/<user_id>/favorites", methods=["GET"])
-def get_user_favorites(user_id):
+# 🔹 Favoriten des eingeloggten Nutzers abrufen
+@favorite_bp.route("/me", methods=["GET"])
+@jwt_required()
+def get_my_favorites():
+    user_id = get_jwt_identity()
     favorites = Favorite.query.filter_by(user_id=user_id).all()
-    return jsonify([
-        {
-            "id": f.id,
-            "story_id": f.story_id,
-            "user_id": f.user_id
-        } for f in favorites
-    ]), 200
+
+    data = []
+    for fav in favorites:
+        story = Story.query.get(fav.story_id)
+        if story:
+            data.append({
+                "id": story.id,
+                "title": story.title,
+                "cover_image": story.cover_image,
+                "genre": story.genre,
+                "description": story.description
+            })
+    return jsonify(data), 200
 
 
-# 🔹 POST: Story favorisieren oder entfernen (toggle)
-@favorite_bp.route("/stories/<story_id>/favorite", methods=["POST"])
+# 🔹 Story favorisieren oder entfernen (toggle)
+@favorite_bp.route("/toggle/<story_id>", methods=["POST"])
+@jwt_required()
 def toggle_favorite(story_id):
-    data = request.get_json()
-    user_id = data.get("user_id")
+    user_id = get_jwt_identity()
 
-    if not user_id:
-        return jsonify({"error": "user_id is required"}), 400
-
-    user = User.query.get(user_id)
     story = Story.query.get(story_id)
-    if not user or not story:
-        return jsonify({"error": "Invalid user_id or story_id"}), 404
+    if not story:
+        return jsonify({"error": "Invalid story_id"}), 404
 
-    existing_fav = Favorite.query.filter_by(user_id=user_id, story_id=story_id).first()
-
-    if existing_fav:
-        db.session.delete(existing_fav)
+    existing = Favorite.query.filter_by(user_id=user_id, story_id=story_id).first()
+    if existing:
+        db.session.delete(existing)
         db.session.commit()
-        return jsonify({"message": "Story removed from favorites"}), 200
+        return jsonify({"message": "Removed from favorites"}), 200
     else:
-        new_fav = Favorite(user_id=user_id, story_id=story_id)
-        db.session.add(new_fav)
+        fav = Favorite(user_id=user_id, story_id=story_id)
+        db.session.add(fav)
         db.session.commit()
-        return jsonify({"message": "Story added to favorites"}), 201
+        return jsonify({"message": "Added to favorites"}), 201

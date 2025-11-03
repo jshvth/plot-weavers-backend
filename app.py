@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, send_from_directory
 from config import Config
 from extensions import db, jwt
 from routes.auth_routes import auth_bp
@@ -13,14 +13,13 @@ from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import os
 
-
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
     local_ports = [f"http://localhost:{port}" for port in range(5173, 5180)]
 
-    #  CORS vollständig aktivieren
+    # 🔹 CORS komplett aktivieren
     CORS(
         app,
         resources={r"/*": {"origins": local_ports + [
@@ -31,13 +30,14 @@ def create_app():
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
     )
 
-    # ✅ Preflight-Handler für alle OPTIONS-Anfragen
+    # 🔹 OPTIONS-Preflight für CORS
     @app.before_request
     def handle_preflight():
         if request.method == "OPTIONS":
             response = make_response()
             origin = request.headers.get("Origin", "")
-            if origin in ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "http://localhost:5177", "https://plot-weavers-frontend.onrender.com"]:
+            allowed_origins = local_ports + ["https://plot-weavers-frontend.onrender.com"]
+            if origin in allowed_origins:
                 response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
@@ -45,11 +45,11 @@ def create_app():
             response.status_code = 204
             return response
 
-    # Init Extensions
+    # 🔹 Extensions
     db.init_app(app)
     jwt.init_app(app)
 
-    # Upload-Ordner sicherstellen
+    # 🔹 Upload-Ordner sicherstellen
     os.makedirs(app.config["UPLOAD_FOLDER_PROFILES"], exist_ok=True)
     os.makedirs(app.config["UPLOAD_FOLDER_STORIES"], exist_ok=True)
 
@@ -69,6 +69,10 @@ def create_app():
         folder = os.path.join(app.root_path, "uploads", "stories")
         return send_from_directory(folder, filename)
 
+    @app.route("/uploads/profiles/<path:filename>")
+    def serve_profile_image(filename):
+        folder = os.path.join(app.root_path, "uploads", "profiles")
+        return send_from_directory(folder, filename)
     @app.route("/")
     def index():
         return {"message": "✅ PlotWeavers Backend is running!"}

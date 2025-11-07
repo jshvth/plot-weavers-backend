@@ -208,22 +208,3 @@ def my_stories():
         }
         for s in stories
     ])
-
-# 🟢 Eigene Stories abrufen (basierend auf eingeloggtem User)
-@story_bp.route("/my-stories", methods=["GET"])
-@jwt_required()
-def my_stories():
-    user_id = get_jwt_identity()
-    stories = Story.query.filter_by(user_id=user_id).all()
-
-    return jsonify([
-        {
-            "id": s.id,
-            "title": s.title,
-            "description": s.description,
-            "genre": s.genre,
-            "cover_image": s.cover_image,
-            "created_by": s.creator.username if s.creator else "Unknown",
-        }
-        for s in stories
-    ]), 200

@@ -28,7 +28,7 @@ def get_my_stories():
 @jwt_required()
 def get_my_chapters():
     user_id = get_jwt_identity()
-    chapters = Chapter.query.filter_by(created_by=user_id).all()
+    chapters = Chapter.query.filter_by(user_id=user_id).all()
     return jsonify([
         {
             "id": c.id,

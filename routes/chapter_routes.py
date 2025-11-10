@@ -80,8 +80,20 @@ def get_chapter(id):
 @jwt_required()
 def delete_chapter(id):
     chapter = Chapter.query.get_or_404(id)
+    current_user_id = get_jwt_identity()
 
-    if chapter.user_id != get_jwt_identity():
+    # 🔹 Hole den aktuellen User aus der Datenbank
+    from models import User
+    user = User.query.get(current_user_id)
+
+    # 🟡 Admin darf alles löschen
+    if user and user.username == "admin":
+        db.session.delete(chapter)
+        db.session.commit()
+        return jsonify({"message": "Chapter deleted by admin"})
+
+    # 🟢 Normale Berechtigungsprüfung
+    if chapter.user_id != current_user_id:
         return jsonify({"error": "Unauthorized"}), 403
 
     db.session.delete(chapter)

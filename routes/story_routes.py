@@ -93,18 +93,31 @@ def get_story(id):
 
 
 # ============================================================
-# 🟢 Story löschen
+# 🟢 Story löschen (Admin darf alles)
 # ============================================================
 @story_bp.route("/<id>", methods=["DELETE"])
 @jwt_required()
 def delete_story(id):
     story = Story.query.get_or_404(id)
-    if story.user_id != get_jwt_identity():
+    current_user_id = get_jwt_identity()
+
+    # 🔹 Hole den aktuellen User aus der Datenbank
+    from models import User
+    user = User.query.get(current_user_id)
+
+    # 🟡 Admin darf alles löschen
+    if user and user.username == "admin":
+        db.session.delete(story)
+        db.session.commit()
+        return jsonify({"message": "Story deleted by admin"})
+
+    # 🟢 Normale Berechtigungsprüfung
+    if story.user_id != current_user_id:
         return jsonify({"error": "Unauthorized"}), 403
+
     db.session.delete(story)
     db.session.commit()
     return jsonify({"message": "Story deleted"})
-
 
 # ============================================================
 # 🟢 Upload-Route für Titelbilder

@@ -56,4 +56,12 @@ def create_default_admin():
         db.session.commit()
         print("✅ Default admin created: username='admin', password='admin'")
 
+    test_user = User.query.filter_by(username="testuser").first()
+    if not test_user:
+        test_user = User(username="testuser")
+        test_user.set_password("testuser")
+        db.session.add(test_user)
+        db.session.commit()
+        print("✅ Default testuser created: username='testuser', password='testuser'")
+
     current_app._admin_created = True

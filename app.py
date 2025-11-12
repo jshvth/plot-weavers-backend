@@ -61,7 +61,7 @@ def create_app():
     app.register_blueprint(upload_bp, url_prefix="/upload")
     app.register_blueprint(like_bp, url_prefix="/likes")
     app.register_blueprint(favorite_bp, url_prefix="/favorites")
-    app.register_blueprint(comment_bp, url_prefix="/comments")
+    app.register_blueprint(comment_bp)
 
     # 🖼️ STATIC ROUTE: für Story-Bilder
     @app.route("/uploads/stories/<path:filename>")

@@ -28,7 +28,11 @@ def login():
         return jsonify({"error": "Invalid credentials"}), 401
 
     access_token = create_access_token(identity=user.id)
-    return jsonify({"access_token": access_token, "username": user.username}), 200
+    return jsonify({
+        "access_token": access_token,
+        "username": user.username,
+        "id": user.id
+    }), 200
 
 
 @auth_bp.route("/me", methods=["GET"])

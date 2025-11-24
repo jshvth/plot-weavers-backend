@@ -17,14 +17,18 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    vercel_domain = "https://plot-weavers-frontend.vercel.app"
     local_ports = [f"http://localhost:{port}" for port in range(5173, 5180)]
+
+    allowed_origins = local_ports + [
+        "https://plot-weavers-frontend.onrender.com",
+        vercel_domain
+    ]
 
     # 🔹 CORS komplett aktivieren
     CORS(
         app,
-        resources={r"/*": {"origins": local_ports + [
-            "https://plot-weavers-frontend.onrender.com"
-        ]}},
+        resources={r"/*": {"origins": allowed_origins}},  # Liste verwenden
         supports_credentials=True,
         allow_headers=["Content-Type", "Authorization"],
         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
@@ -36,9 +40,10 @@ def create_app():
         if request.method == "OPTIONS":
             response = make_response()
             origin = request.headers.get("Origin", "")
-            allowed_origins = local_ports + ["https://plot-weavers-frontend.onrender.com"]
+
             if origin in allowed_origins:
                 response.headers["Access-Control-Allow-Origin"] = origin
+
             response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
             response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
             response.headers["Access-Control-Allow-Credentials"] = "true"

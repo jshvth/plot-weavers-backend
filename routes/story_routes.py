@@ -92,7 +92,8 @@ def get_story(id):
             else f"https://plot-weavers-backend.onrender.com{s.cover_image}"
             if s.cover_image else None
         ),
-        "created_by": s.creator.username if s.creator else "Unknown"
+        "created_by": s.creator.username if s.creator else "Unknown",
+        "author": s.creator.username if s.creator else "Unknown"
     })
 
 

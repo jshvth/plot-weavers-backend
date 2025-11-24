@@ -55,6 +55,10 @@ def create_story():
     db.session.add(story)
     db.session.commit()
 
+    # Creator-Objekt manuell abrufen (sonst bleibt es None)
+    from models import User
+    creator = User.query.get(user_id)
+
     return jsonify({
         "message": "Story created successfully",
         "story": {
@@ -67,7 +71,7 @@ def create_story():
                 else f"https://plot-weavers-backend.onrender.com{story.cover_image}"
                 if story.cover_image else None
             ),
-            "created_by": story.creator.username
+            "created_by": creator.username if creator else "Unknown"
         }
     }), 201
 
